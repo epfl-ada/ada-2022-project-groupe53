@@ -14,7 +14,7 @@ class Graph:
          self.nb_categories = 0
          self.nb_topics = 0
          self.backlicks = 0
-
+         self.edges = 0
 
 
 
@@ -65,8 +65,10 @@ class Graph:
             self.backlicks += 0.5
            
         else:
-            assert article1 in self.articles
-            assert article2 in self.articles
+            if  article1 not in self.articles or article2 not in self.articles:
+                print("Article not found")
+                return
+
             category1 = self.articles[article1].category
             category2 = self.articles[article2].category
           
@@ -84,7 +86,7 @@ class Graph:
                 else:
                     self.matrix[category1][category2] += 1
                 
-
+            self.edges += 1
             #update categories attributes
             self.categories[category1].update_neighbors(category2,out=True)
             self.categories[category2].update_neighbors(category1,out=False)
