@@ -1,6 +1,6 @@
 
 from graph import Graph
-
+import csv
 
 graph  = Graph()
 
@@ -8,7 +8,10 @@ graph  = Graph()
 ##Part 1 : read the articles category file 
 ## for each article initialize the article 
 ## and add it to the graph (with the same function we initialize the categories and topics)
-
+with open("data/categories.tsv") as file:
+    tsv_file = csv.reader(file, delimiter="\t")
+    for line in tsv_file:
+        print(line)
 
 ### this will create all categories , articles and topics  and put them in the graph
 
