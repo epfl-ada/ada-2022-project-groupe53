@@ -7,7 +7,8 @@ class Category:
         self.articles = {}
         self.title = title
         self.topic = topic
-        self.neighbors =  {}
+        self.neighbors_out =  {}
+        self.neighbors_in =  {}
         self.out_weight = 0
         self.in_weight = 0
         self.size = 0
@@ -18,13 +19,23 @@ class Category:
         self.size += 1
     
     def update_neighbors(self,category,out=True):
-        if category not in self.neighbors:
-            self.neighbors[category] = 1
-        else:
-            self.neighbors[category] += 1
+      
 
         if out:
             self.out_weight += 1
+            if category not in self.neighbors_out :
+                self.neighbors_out[category] = 1
+            else:
+                self.neighbors_out[category] += 1
         else:
+
             self.in_weight += 1
+            if category not in self.neighbors_in :
+                self.neighbors_in[category] = 1
+            else:
+                self.neighbors_in[category] += 1
         
+
+
+    
+       

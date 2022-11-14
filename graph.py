@@ -75,6 +75,9 @@ class Graph:
             assert category1 in self.categories
             assert category2 in self.categories
 
+            
+            if category1== category2:
+                return
             if category1 not in self.matrix:
                 self.matrix[category1]= {}
                 self.matrix[category1][category2] = 1
@@ -86,6 +89,7 @@ class Graph:
                 else:
                     self.matrix[category1][category2] += 1
                 
+
             self.edges += 1
             #update categories attributes
             self.categories[category1].update_neighbors(category2,out=True)
