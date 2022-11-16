@@ -1,1 +1,5 @@
 data/
+__pycache__/article.cpython-39.pyc
+__pycache__/category.cpython-39.pyc
+__pycache__/graph.cpython-39.pyc
+__pycache__/topic.cpython-39.pyc

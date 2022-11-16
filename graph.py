@@ -1,4 +1,5 @@
 import numpy as np
+import csv
 
 from category import Category
 from topic import Topic
@@ -29,10 +30,6 @@ class Graph:
         #update the topics
         self.update_topics(article.topic,article)
 
-
-
-
-
     def update_categories(self, category,article):
 
         if category not in self.categories: #if category not already initialized
@@ -41,11 +38,6 @@ class Graph:
        
 
         self.categories[category].add_article(article)
-
-
-
-
-
 
     def update_topics(self, topic,article):
 
@@ -56,17 +48,14 @@ class Graph:
      
         self.topics[topic].add_category(article.category)
             
-
-
-
     def add_edge(self,article1,article2):
-        print(article1,article2)
         if article1 == '<' or article2 == '<':
             self.backlicks += 0.5
            
         else:
             if  article1 not in self.articles or article2 not in self.articles:
-                print("Article not found")
+                print("Article not found : {} or {}".format(article1,article2))
+            
                 return
 
             category1 = self.articles[article1].category
@@ -96,3 +85,23 @@ class Graph:
             self.categories[category2].update_neighbors(category1,out=False)
 
 
+    def update_graph(self, file_path , edges=False, verbose= False):
+        with open(file_path) as file:
+            tsv_file = csv.reader(file, delimiter="\t")
+            idx = 0
+            for line in tsv_file:
+                # Skip empty or commented lines 
+                if len(line)==0 or line[0].startswith("#"):
+                    continue
+                else:
+                    if edges :
+                        articles = line[3].split(';')
+                        for i in range(len(articles)-1):
+                            self.add_edge(articles[i],articles[i+1])
+                    else :           
+                        article = Article(idx,line[0],line[1].split('.')[-1],line[1].split('.')[1])
+                        idx+=+1
+                        self.add_article(article)
+        if verbose :
+            print("The graph has {} articles, \n{} categories, \n{} topics,\nand {} edges.".format(
+                self.nb_articles, self.nb_categories, self.nb_topics, self.edges))
