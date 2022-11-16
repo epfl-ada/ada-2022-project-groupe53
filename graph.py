@@ -6,6 +6,12 @@ from topic import Topic
 from article import Article
 
 class Graph:
+    """Graph class
+    Args:
+    categories : dict of Category, key is the id of categories, value is the category object
+    topics : dict of Topic, key is the name of topics, value is the topic object
+    articles : dict of Article, key is the id of articles, value is the article object
+    """
     def __init__(self):
          self.categories = {}
          self.articles = {}
@@ -30,17 +36,16 @@ class Graph:
         #update the topics
         self.update_topics(article.topic,article)
 
-    def update_categories(self, category,article):
 
-        if category not in self.categories: #if category not already initialized
+    def update_categories(self, category,article):
+        # Checks if the category was already initialized
+        if category not in self.categories: 
+            
             self.categories[category] = Category(category,article.topic)
             self.nb_categories += 1
-       
-
         self.categories[category].add_article(article)
 
     def update_topics(self, topic,article):
-
         if topic not in self.topics:  #if topic not already initialized
             self.topics[topic] = Topic(topic)
             self.nb_topics += 1
