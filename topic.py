@@ -15,7 +15,7 @@ class Topic:
         self.name = name
         self.categories = {}
         self.categories_count = {}
-        self.size = 0
+        self.number = 0
 
     """"
     Args:
@@ -24,15 +24,9 @@ class Topic:
     """
     
     def add_category(self, category):
-
-        if category not in self.categories:
-            # Add the category to the categories dict
-            self.categories[category] = category
-            # Update the size of the topic
-            self.categories_count[category] = 1
+        if category.title not in self.categories:
+            self.categories[category.title] = category
+            self.categories_count[category.title] = 1
         else:
-            # If the category is already in the categories dict, update the number of times 
-            self.categories_count[category] += 1
-
-
-   
+            self.categories_count[category.title] += 1
+        self.number += 1

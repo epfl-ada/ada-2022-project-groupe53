@@ -17,6 +17,7 @@ class Graph:
          self.articles = {}
          self.topics = {}
          self.matrix = {}
+         self.matrixt = {}
          self.nb_articles = 0
          self.nb_categories = 0
          self.nb_topics = 0
@@ -43,6 +44,7 @@ class Graph:
             
             self.categories[category] = Category(category,article.topic)
             self.nb_categories += 1
+        print(self.categories[category].topic)
         self.categories[category].add_article(article)
 
     def update_topics(self, topic,article):
@@ -51,7 +53,7 @@ class Graph:
             self.nb_topics += 1
        
      
-        self.topics[topic].add_category(article.category)
+        self.topics[topic].add_category(self.categories[article.category])
             
     def add_edge(self,article1,article2):
         if article1 == '<' or article2 == '<':
@@ -103,6 +105,7 @@ class Graph:
                         articles = line[3].split(';')
                         for i in range(len(articles)-1):
                             self.add_edge(articles[i],articles[i+1])
+                            self.add_edge_topic(articles[i],articles[i+1])
                     else :           
                         article = Article(idx,line[0],line[1].split('.')[-1],line[1].split('.')[1])
                         idx+=+1
@@ -110,3 +113,38 @@ class Graph:
         if verbose :
             print("The graph has {} articles, \n{} categories, \n{} topics,\nand {} edges.".format(
                 self.nb_articles, self.nb_categories, self.nb_topics, self.edges))
+
+            
+    def add_edge_topic(self,article1,article2):
+        print(article1,article2)
+        if article1 == '<' or article2 == '<':
+            self.backlicks += 0.5
+           
+        else:
+            if  article1 not in self.articles or article2 not in self.articles:
+                print("Article not found")
+                return
+
+            category1 = self.articles[article1].topic
+            category2 = self.articles[article2].topic
+          
+            assert category1 in self.topics
+            assert category2 in self.topics
+
+            
+            if category1== category2:
+                return
+            if category1 not in self.matrixt:
+                self.matrixt[category1]= {}
+                self.matrixt[category1][category2] = 1
+            
+
+            else:
+                if category2 not in self.matrixt[category1]:
+                    self.matrixt[category1][category2] = 1
+                else:
+                    self.matrixt[category1][category2] += 1
+                
+
+            self.edges += 1
+
