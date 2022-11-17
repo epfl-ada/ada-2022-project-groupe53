@@ -115,7 +115,7 @@ class Graph:
                             self.add_edge(articles[i],articles[i+1])
                            
                     else :           
-                        article = Article(idx,line[0],line[1].split('.')[1])
+                        article = Article(line[0],line[1].split('.')[1], line[1].split('.')[-1])
                         idx+=+1
                         self.add_article(article)
         if verbose :
