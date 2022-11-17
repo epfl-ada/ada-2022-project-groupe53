@@ -13,97 +13,72 @@ class Graph:
     articles : dict of Article, key is the id of articles, value is the article object
     """
     def __init__(self):
-         self.categories = {}
-         self.articles = {}
+        self.articles = {}
+        self.categories = {}
+        self.topics =  {}     
        
-         self.matrix = {}
-         self.matrixt = {}
-         self.nb_articles = 0
-         self.nb_categories = 0
-         self.memory = {}
-         self.backlicks = 0
-         self.edges = 0
-
-
-
-    def add_article(self,article):
-        self.nb_articles += 1
-        #add article to the graph
-        self.articles[article.title] = article
         
-        #update the categories
-        self.update_categories(article.category,article)
+        self.matrix_articles = {}
+        self.matrix_categories = {}
+        self.matrix_topics =  {}
 
-     
+        self.backlicks = 0
+        self.memory = {}
 
+    def nb_verteces(self , level = "articles"):
 
-    def update_categories(self, category,article):
-        # Checks if the category was already initialized
-        if category not in self.categories: 
-            
-            self.categories[category] = Category(category)
-            self.nb_categories += 1
-       
-        self.categories[category].add_article(article)
+        assert level in ["articles", "categories", "topics"]
 
-   
-     
+        if level == "articles":
+            return len(self.articles)
+        elif level == "categories":
+            return len(self.categories)
+        elif level == "topics":
+            return len(self.topics)
     
-            
-    def add_edge(self,article1,article2):
-        if article1 == '<' :
-            self.backlicks += 0.5
-            article1 = self.previous_article
+    def nb_unique_edges(self, level = "articles"):
+        
+        assert level in ["articles", "categories", "topics"]
 
-        if article2 == '<' :
-            self.backlicks += 0.5
-            self.previous_article = article1
-           
+        if level == "articles":
+            matrix = self.matrix_articles
+        elif level == "categories":
+            matrix = self.matrix_categories
+        elif level == "topics":
+            matrix = self.matrix_topics
+        
+        return sum([len(matrix[title]) for title in matrix.keys()])
 
-        else:
-            if  article1 not in self.articles or article2 not in self.articles:
-                #print("Article not found : {} or {}".format(article1,article2))
-            
-                return
-            if article1 not in self.memory:
-                self.memory[article1] = {}
-                
-            if article1  in self.memory and article2 in self.memory[article1]:
-                    return
+    def nb_total_edges_out(self, level = "articles"):
+        
+        assert level in ["articles", "categories", "topics"]
 
-            else:
-                self.memory[article1][article2] = 1
-                category1 = self.articles[article1].category
-                category2 = self.articles[article2].category
-            
-                assert category1 in self.categories
-                assert category2 in self.categories
+        if level == "articles":
+            verteces = self.articles
+        elif level == "categories":
+            verteces = self.categories
+        elif level == "topics":
+            verteces = self.topics
+        
+        return sum([vertex.get_total_out_weight() for vertex in verteces.values()])
 
-                
-                if category1== category2:
-                    return
-                if category1 not in self.matrix:
-                    self.matrix[category1]= {}
-                    self.matrix[category1][category2] = 1
-                
+    def nb_total_edges_in(self, level = "articles"):
+        
+        assert level in ["articles", "categories", "topics"]
 
-                else:
-                    if category2 not in self.matrix[category1]:
-                        self.matrix[category1][category2] = 1
-                    else:
-                        self.matrix[category1][category2] += 1
-                    
-
-                self.edges += 1
-                #update categories attributes
-                self.categories[category1].update_neighbors(category2,out=True)
-                self.categories[category2].update_neighbors(category1,out=False)
+        if level == "articles":
+            verteces = self.articles
+        elif level == "categories":
+            verteces = self.categories
+        elif level == "topics":
+            verteces = self.topics
+        
+        return sum([vertex.get_total_in_weight() for vertex in verteces.values()])
 
 
     def update_graph(self, file_path , edges=False, verbose= False):
         with open(file_path) as file:
             tsv_file = csv.reader(file, delimiter="\t")
-            idx = 0
             for line in tsv_file:
                 # Skip empty or commented lines 
                 if len(line)==0 or line[0].startswith("#"):
@@ -116,11 +91,113 @@ class Graph:
                            
                     else :           
                         article = Article(line[0],line[1].split('.')[1], line[1].split('.')[-1])
-                        idx+=+1
                         self.add_article(article)
         if verbose :
-            print("The graph has {} articles, \n{} categories, \nand {} edges.".format(
-                self.nb_articles, self.nb_categories, self.edges))
+            print("The graph has {} articles, {} categories, and {} topics.".format(
+                self.nb_verteces("articles"), self.nb_verteces("categories"),  self.nb_verteces("topics")))
+            print("The number of edges is :\n{} in the articles graph,\n{} in the categories graph,\n{} in the topics graph.".format(
+                self.nb_unique_edges("articles"), self.nb_unique_edges("categories"),  self.nb_unique_edges("topics")))
+    
+    def add_article(self,article):
+        #add article to the graph
+        self.articles[article.title] = article
+        #update the categories
+        category = self.update_categories(article.category,article)
+        #update the topics
+        self.update_topics(article.topic,category)
+
+    def update_categories(self, category,article):
+        # Checks if the category was already initialized
+        if category not in self.categories: 
+            self.categories[category] = Category(category, article.topic)
+            self.categories[category].add_article(article)
+        return self.categories[category]
+    
+    def update_topics(self, topic,category):
+        # Checks if the category was already initialized
+        if topic not in self.topics: 
+            self.topics[topic] = Topic(topic)
+            self.topics[topic].add_category(category)
+
+   
+         
+    def add_edge(self,article1,article2):
+        if article1 == '<' :
+            self.backlicks += 0.5
+            article1 = self.previous_article
+
+        if article2 == '<' :
+            self.backlicks += 0.5
+            self.previous_article = article1
+           
+
+        else:
+            if  article1 not in self.articles or article2 not in self.articles:
+                return
+
+            assert article1 in self.articles
+            assert article2 in self.articles
+
+            ## update the articles-matrix
+            if article1 not in self.matrix_articles:
+                self.matrix_articles[article1] = {}
+                self.matrix_articles[article1][article2] = 1
+            else:
+                if article2 not in self.matrix_articles[article1]:
+                    self.matrix_articles[article1][article2] = 1
+                else:
+                    self.matrix_articles[article1][article2] += 1
+            # update the articles attributes
+            self.articles[article1].update_neighbors(self.articles[article2],out=True)
+            self.articles[article2].update_neighbors(self.articles[article1],out=False)
+
+            category1 = self.articles[article1].category
+            category2 = self.articles[article2].category
+            
+            assert category1 in self.categories
+            assert category2 in self.categories
+            
+            ## update the category-matrix
+            if category1== category2:
+                return
+            if category1 not in self.matrix_categories:
+                self.matrix_categories[category1]= {}
+                self.matrix_categories[category1][category2] = 1
+            else:
+                if category2 not in self.matrix_categories[category1]:
+                    self.matrix_categories[category1][category2] = 1
+                else:
+                    self.matrix_categories[category1][category2] += 1
+            
+            #update categories attributes
+            self.categories[category1].update_neighbors(category2,out=True)
+            self.categories[category2].update_neighbors(category1,out=False)
+            
+            topic1 = self.articles[article1].topic
+            topic2 = self.articles[article2].topic
+
+            assert topic1 in self.topics
+            assert topic2 in self.topics
+
+            ## update the topic-matrix
+            if topic1== topic2:
+                return
+            if topic1 not in self.matrix_topics:
+                self.matrix_topics[topic1]= {}
+                self.matrix_topics[topic1][topic2] = 1
+            else:
+                if topic2 not in self.matrix_topics[topic1]:
+                    self.matrix_topics[topic1][topic2] = 1
+                else:
+                    self.matrix_topics[topic1][topic2] += 1
+            
+            #update topics attributes
+            self.topics[topic1].update_neighbors(topic2,out=True)
+            self.topics[topic2].update_neighbors(topic1,out=False)
+
+
+
+    
 
             
    

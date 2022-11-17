@@ -1,5 +1,3 @@
-
-
 class Topic:
     """Topic class
     Args:
@@ -30,10 +28,12 @@ class Topic:
         return sum(self.neighbors_in.values())
 
 
+    def add_category(self, category):
+        self.categories[category.title]=category
+
     """"
     Args:
-    category : Category object to add to the topic
-    Adds the category to the topic and updates the size of the topic
+
     """
     
     def update_neighbors(self,topic,out=True):

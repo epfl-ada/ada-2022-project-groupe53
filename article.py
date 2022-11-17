@@ -1,5 +1,3 @@
-
-
 class Article: 
     """Article class
     Args:
@@ -27,7 +25,6 @@ class Article:
     def update_neighbors(self,article,out=True):
         if out:
             # Update the number of outgoing links 
-            self.out_weight += 1
             if article not in self.neighbors_out :
                 # If the category is not in the neighbors_out dict, add it
                 self.neighbors_out[article] = 1
@@ -36,7 +33,6 @@ class Article:
                 self.neighbors_out[article] += 1
         else:
             # Update the number of incoming links
-            self.in_weight += 1
             if article not in self.neighbors_in :
                 # If the category is not in the neighbors_in dict, add it
                 self.neighbors_in[article] = 1

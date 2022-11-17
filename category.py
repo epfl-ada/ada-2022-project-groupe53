@@ -33,7 +33,7 @@ class Category:
 
     """
     def add_article(self, article):
-        # Add the article to the articles dict
+  
         self.articles[article.title]=article
 
     """
