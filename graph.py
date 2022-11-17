@@ -15,12 +15,12 @@ class Graph:
     def __init__(self):
          self.categories = {}
          self.articles = {}
-         self.topics = {}
+       
          self.matrix = {}
          self.matrixt = {}
          self.nb_articles = 0
          self.nb_categories = 0
-         self.nb_topics = 0
+         self.memory = {}
          self.backlicks = 0
          self.edges = 0
 
@@ -34,62 +34,70 @@ class Graph:
         #update the categories
         self.update_categories(article.category,article)
 
-        #update the topics
-        self.update_topics(article.topic,article)
+     
 
 
     def update_categories(self, category,article):
         # Checks if the category was already initialized
         if category not in self.categories: 
             
-            self.categories[category] = Category(category,article.topic)
+            self.categories[category] = Category(category)
             self.nb_categories += 1
-        print(self.categories[category].topic)
+       
         self.categories[category].add_article(article)
 
-    def update_topics(self, topic,article):
-        if topic not in self.topics:  #if topic not already initialized
-            self.topics[topic] = Topic(topic)
-            self.nb_topics += 1
-       
+   
      
-        self.topics[topic].add_category(self.categories[article.category])
+    
             
     def add_edge(self,article1,article2):
-        if article1 == '<' or article2 == '<':
+        if article1 == '<' :
             self.backlicks += 0.5
+            article1 = self.previous_article
+
+        if article2 == '<' :
+            self.backlicks += 0.5
+            self.previous_article = article1
            
+
         else:
             if  article1 not in self.articles or article2 not in self.articles:
-                print("Article not found : {} or {}".format(article1,article2))
+                #print("Article not found : {} or {}".format(article1,article2))
             
                 return
-
-            category1 = self.articles[article1].category
-            category2 = self.articles[article2].category
-          
-            assert category1 in self.categories
-            assert category2 in self.categories
-
-            
-            if category1== category2:
-                return
-            if category1 not in self.matrix:
-                self.matrix[category1]= {}
-                self.matrix[category1][category2] = 1
-            
+            if article1 not in self.memory:
+                self.memory[article1] = {}
+                
+            if article1  in self.memory and article2 in self.memory[article1]:
+                    return
 
             else:
-                if category2 not in self.matrix[category1]:
+                self.memory[article1][article2] = 1
+                category1 = self.articles[article1].category
+                category2 = self.articles[article2].category
+            
+                assert category1 in self.categories
+                assert category2 in self.categories
+
+                
+                if category1== category2:
+                    return
+                if category1 not in self.matrix:
+                    self.matrix[category1]= {}
                     self.matrix[category1][category2] = 1
-                else:
-                    self.matrix[category1][category2] += 1
                 
 
-            self.edges += 1
-            #update categories attributes
-            self.categories[category1].update_neighbors(category2,out=True)
-            self.categories[category2].update_neighbors(category1,out=False)
+                else:
+                    if category2 not in self.matrix[category1]:
+                        self.matrix[category1][category2] = 1
+                    else:
+                        self.matrix[category1][category2] += 1
+                    
+
+                self.edges += 1
+                #update categories attributes
+                self.categories[category1].update_neighbors(category2,out=True)
+                self.categories[category2].update_neighbors(category1,out=False)
 
 
     def update_graph(self, file_path , edges=False, verbose= False):
@@ -105,46 +113,14 @@ class Graph:
                         articles = line[3].split(';')
                         for i in range(len(articles)-1):
                             self.add_edge(articles[i],articles[i+1])
-                            self.add_edge_topic(articles[i],articles[i+1])
+                           
                     else :           
-                        article = Article(idx,line[0],line[1].split('.')[-1],line[1].split('.')[1])
+                        article = Article(idx,line[0],line[1].split('.')[1])
                         idx+=+1
                         self.add_article(article)
         if verbose :
-            print("The graph has {} articles, \n{} categories, \n{} topics,\nand {} edges.".format(
-                self.nb_articles, self.nb_categories, self.nb_topics, self.edges))
+            print("The graph has {} articles, \n{} categories, \nand {} edges.".format(
+                self.nb_articles, self.nb_categories, self.edges))
 
             
-    def add_edge_topic(self,article1,article2):
-        print(article1,article2)
-        if article1 == '<' or article2 == '<':
-            self.backlicks += 0.5
-           
-        else:
-            if  article1 not in self.articles or article2 not in self.articles:
-                print("Article not found")
-                return
-
-            category1 = self.articles[article1].topic
-            category2 = self.articles[article2].topic
-          
-            assert category1 in self.topics
-            assert category2 in self.topics
-
-            
-            if category1== category2:
-                return
-            if category1 not in self.matrixt:
-                self.matrixt[category1]= {}
-                self.matrixt[category1][category2] = 1
-            
-
-            else:
-                if category2 not in self.matrixt[category1]:
-                    self.matrixt[category1][category2] = 1
-                else:
-                    self.matrixt[category1][category2] += 1
-                
-
-            self.edges += 1
-
+   

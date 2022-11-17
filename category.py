@@ -14,10 +14,10 @@ class Category:
     in_weight : int , the number of time the category is linked to another category (incoming links)
     size : int, the number of articles in the category
     """
-    def __init__(self, title,topic):
+    def __init__(self, title):
         self.articles = {}
         self.title = title
-        self.topic = topic
+    
         self.neighbors_out =  {}
         self.neighbors_in =  {}
         self.out_weight = 0

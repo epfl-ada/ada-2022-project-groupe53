@@ -15,7 +15,7 @@ class Topic:
         self.name = name
         self.categories = {}
         self.categories_count = {}
-        self.number = 0
+        self.size = 0
 
     """"
     Args:
@@ -23,10 +23,10 @@ class Topic:
     Adds the category to the topic and updates the size of the topic
     """
     
-    def add_category(self, category):
+    def update_category(self, category):
         if category.title not in self.categories:
             self.categories[category.title] = category
             self.categories_count[category.title] = 1
         else:
             self.categories_count[category.title] += 1
-        self.number += 1
+        self.size += 1
