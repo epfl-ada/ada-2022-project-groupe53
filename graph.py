@@ -38,21 +38,6 @@ class Graph:
         
         return sum([len(matrix[title]) for title in matrix.keys()])
 
-    def nb_total_edges_out(self, level ):
-        
-        assert level in self.authorized_levels
-        _ , verteces = self.levels_map[level]
-        
-        return sum([vertex.get_total_out_weight() for vertex in verteces.values()])
-
-    def nb_total_edges_in(self, level):
-        
-        assert level in self.authorized_levels
-        _ , verteces = self.levels_map[level]
-        
-        return sum([vertex.get_total_in_weight() for vertex in verteces.values()])
-
-
     def update_graph(self, file_path , edges=False, verbose= False):
         with open(file_path) as file:
             tsv_file = csv.reader(file, delimiter="\t")
@@ -61,14 +46,21 @@ class Graph:
                 if len(line)==0 or line[0].startswith("#"):
                     continue
                 else:
+
                     if edges :
                         articles = line[3].split(';')
                         for i in range(len(articles)-1):
                             self.add_edge(articles[i],articles[i+1])
+                            
                            
                     else :           
                         article = Article(line[0],line[1].split('.')[1], line[1].split('.')[-1])
                         self.add_article(article)
+                        #update the categories
+                        category = self.update_categories(article.category,article)
+                        #update the topics
+                        self.update_topics(article.topic,category)
+
         if verbose :
             print("The graph has {} articles, {} categories, and {} topics.".format(
                 self.nb_verteces("articles"), self.nb_verteces("categories"),  self.nb_verteces("topics")))
@@ -79,11 +71,7 @@ class Graph:
     def add_article(self,article):
         #add article to the graph
         self.articles[article.title] = article
-        #update the categories
-        category = self.update_categories(article.category,article)
-        #update the topics
-        self.update_topics(article.topic,category)
-
+       
     def update_categories(self, category,article):
         # Checks if the category was already initialized
         if category not in self.categories: 

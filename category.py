@@ -12,9 +12,5 @@ class Category(Vertex):
     def get_nb_different_articles(self):
         return len(self.articles)   
 
-    """
-    Args:
-
-    """
     def add_article(self, article):
         self.articles[article.title]=article
