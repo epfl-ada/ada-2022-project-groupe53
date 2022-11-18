@@ -63,7 +63,7 @@ class Graph:
                     if edges :
                         path = line[3].split(';')
                         backlick = 0 
-                        article1 = 0
+                        article1 = -1
                         article2 = 0
                         for i in range(len(path)-1):
                             if path[i+1] == '<':
@@ -71,13 +71,12 @@ class Graph:
                                 continue
                             elif path[i]== '<': 
                                 article1 = article1-backlick 
-                                backlick = 0
                             else:
-                                article1 +=1
+                                article1 =i
                                 backlick = 0
                             
-
-                            self.add_edge(path[article1],path[i+1])
+                            
+                                self.add_edge(path[article1],path[i+1])
                                                    
                     else :           
                         article = Article(line[0],line[1].split('.')[1], line[1].split('.')[-1])
@@ -118,7 +117,7 @@ class Graph:
          
     def add_edge(self,article1,article2):
        
-          
+      
         # update the articles graph     
         self.update_level(article1,article2,"articles")
 
