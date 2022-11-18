@@ -87,7 +87,7 @@ class Graph:
             self.topics[topic].add_category(category)
         else:
             self.topics[topic].add_category(category)
-            
+
 
          
     def add_edge(self,article1,article2):
@@ -102,6 +102,9 @@ class Graph:
         else:      
             # update the articles graph     
             self.update_level(article1,article2,"articles")
+
+            if self.matrix_articles[article1][article2]> 1:
+                return
 
             category1 = self.articles[article1].category
             category2 = self.articles[article2].category
