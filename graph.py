@@ -7,7 +7,18 @@ from article import Article
 
 class Graph:
     """Graph class
-    Args:
+    articles : dict, the articles of the graph, keys are the titles of the articles
+    categories : dict, the categories of the graph, keys are the names of the categories
+    topics : dict, the topics of the graph, keys are the names of the topics
+
+    matrix_articles : dict, the adjacency matrix of the articles graph
+    matrix_categories : dict, the adjacency matrix of the categories graph
+    matrix_topics : dict, the adjacency matrix of the topics graph
+
+    authorized_levels : list, the authorized levels of the graph
+    levels_map : dict, the map between the levels and the corresponding matrix and vertices
+
+    backlicks : int, the number of backlinks in the graph
     """
     def __init__(self):
         self.articles = {}
@@ -25,11 +36,13 @@ class Graph:
 
         self.backlicks = 0
 
-    def nb_verteces(self , level ):
+
+    """"""
+    def nb_vertices(self , level ):
 
         assert level in self.authorized_levels
-        _ , verteces = self.levels_map[level]
-        return len(verteces)
+        _ , vertices = self.levels_map[level]
+        return len(vertices)
     
     def nb_unique_edges(self, level ):
         
@@ -48,11 +61,10 @@ class Graph:
                 else:
 
                     if edges :
-                        articles = line[3].split(';')
-                        for i in range(len(articles)-1):
-                            self.add_edge(articles[i],articles[i+1])
-                            
-                           
+                        path = line[3].split(';')
+                        for i in range(len(path)-1):
+                            self.add_edge(path[i],path[i+1])
+                                                   
                     else :           
                         article = Article(line[0],line[1].split('.')[1], line[1].split('.')[-1])
                         self.add_article(article)
@@ -63,7 +75,7 @@ class Graph:
 
         if verbose :
             print("The graph has {} articles, {} categories, and {} topics.".format(
-                self.nb_verteces("articles"), self.nb_verteces("categories"),  self.nb_verteces("topics")))
+                self.nb_vertices("articles"), self.nb_vertices("categories"),  self.nb_vertices("topics")))
             print("The number of edges is :\n{} in the articles graph,\n{} in the categories graph,\n{} in the topics graph.".format(
                 self.nb_unique_edges("articles"), self.nb_unique_edges("categories"),  self.nb_unique_edges("topics")))
 
@@ -122,12 +134,12 @@ class Graph:
         # checks that the level is authorized
         assert level in self.authorized_levels
 
-        # Choose the  matrix and the verteces corresponding to the level
-        matrix , verteces = self.levels_map[level]
+        # Choose the  matrix and the vertices corresponding to the level
+        matrix , vertices = self.levels_map[level]
             
-        # Verify if the verteces are already in the graph    
-        assert vertex1 in verteces
-        assert vertex2 in verteces
+        # Verify if the vertices are already in the graph    
+        assert vertex1 in vertices
+        assert vertex2 in vertices
 
         # We don't add edges between the same vertex
         if vertex2 == vertex1:
@@ -143,8 +155,8 @@ class Graph:
             else:
                 matrix[vertex1][vertex2] += 1
         # update the vertex attributes
-        verteces[vertex1].update_neighbors(verteces[vertex2],out=True)
-        verteces[vertex2].update_neighbors(verteces[vertex1],out=False)
+        vertices[vertex1].update_neighbors(vertices[vertex2],out=True)
+        vertices[vertex2].update_neighbors(vertices[vertex1],out=False)
 
     
 

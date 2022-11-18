@@ -3,8 +3,10 @@ from abc import ABC
 class Vertex(ABC): 
     """Vertex class
     title : String, the title of the vertex
-    neighbors_out : Dictionnar of neighbors, key is the title of the neighbor, value is the number of times the link was encountred
-    neighbors_in : Dictionnar of neighbors, key is the title of the neighbor, value is the number of times the link was encountred
+    neighbors_out : Dictionnar of neighbors, key is the title of the neighbor from which the link comes, 
+                                            value is the number of times the link was encountred
+    neighbors_in : Dictionnar of neighbors, key is the title of the neighbor to which the link goes,
+                                             value is the number of times the link was encountred
     """
     def __init__(self,title):
         self.title = title
