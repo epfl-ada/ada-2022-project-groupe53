@@ -51,7 +51,7 @@ class Graph:
         
         return sum([len(matrix[title]) for title in matrix.keys()])
 
-    def update_graph(self, file_path , edges=False, verbose= False):
+    def update_graph(self, file_path , mode='Initialization', verbose= False):
         with open(file_path) as file:
             tsv_file = csv.reader(file, delimiter="\t")
             for line in tsv_file:
@@ -60,7 +60,7 @@ class Graph:
                     continue
                 else:
 
-                    if edges :
+                    if mode == 'common_sense_edges' :
                         path = line[3].split(';')
                         backlick = 0 
                         article1 = -1
@@ -78,14 +78,16 @@ class Graph:
                             
                                 self.add_edge(path[article1],path[i+1])
                                                    
-                    else :           
+                    elif mode == 'Initialization' :           
                         article = Article(line[0],line[1].split('.')[1], line[1].split('.')[-1])
                         self.add_article(article)
                         #update the categories
                         category = self.update_categories(article.category,article)
                         #update the topics
                         self.update_topics(article.topic,category)
-
+                    else:
+                        self.add_edge(line[0],line[1])
+    
         if verbose :
             print("The graph has {} articles, {} categories, and {} topics.".format(
                 self.nb_vertices("articles"), self.nb_vertices("categories"),  self.nb_vertices("topics")))
@@ -117,26 +119,27 @@ class Graph:
          
     def add_edge(self,article1,article2):
        
-      
-        # update the articles graph     
-        self.update_level(article1,article2,"articles")
-
-        if self.matrix_articles[article1][article2]> 1:
+        if(article1 == article2):
             return
+        # update the articles graph     
+        success  = self.update_level(article1,article2,"articles")
+        if success:
+            if self.matrix_articles[article1][article2]> 1:
+                return
 
-        category1 = self.articles[article1].category
-        category2 = self.articles[article2].category
-        
-        # update the categories graph  
-        self.update_level(category1,category2,"categories")
-        
-        topic1 = self.articles[article1].topic
-        topic2 = self.articles[article2].topic
-        
-        # update the topics graph 
-        self.update_level(topic1,topic2,"topics")
+            category1 = self.articles[article1].category
+            category2 = self.articles[article2].category
+            
+            # update the categories graph  
+            self.update_level(category1,category2,"categories")
+            
+            topic1 = self.articles[article1].topic
+            topic2 = self.articles[article2].topic
+            
+            # update the topics graph 
+            self.update_level(topic1,topic2,"topics")
 
-    def update_level (self , vertex1, vertex2, level):
+    def  update_level (self , vertex1, vertex2, level):
         # checks that the level is authorized
         assert level in self.authorized_levels
 
@@ -144,12 +147,14 @@ class Graph:
         matrix , vertices = self.levels_map[level]
             
         # Verify if the vertices are already in the graph    
-        assert vertex1 in vertices
-        assert vertex2 in vertices
+        if vertex1  not in vertices or vertex2 not in vertices:
+            return 0
+
+      
 
         # We don't add edges between the same vertex
         if vertex2 == vertex1:
-            return
+            return 0
 
         ## update the matrix
         if vertex1 not in matrix:
@@ -164,7 +169,7 @@ class Graph:
         vertices[vertex1].update_neighbors(vertices[vertex2],out=True)
         vertices[vertex2].update_neighbors(vertices[vertex1],out=False)
 
-    
+        return 1
 
             
    
