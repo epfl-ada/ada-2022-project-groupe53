@@ -7,120 +7,169 @@ from article import Article
 
 class Graph:
     """Graph class
-    Args:
-    categories : dict of Category, key is the id of categories, value is the category object
-    topics : dict of Topic, key is the name of topics, value is the topic object
-    articles : dict of Article, key is the id of articles, value is the article object
+    articles : dict, the articles of the graph, keys are the titles of the articles
+    categories : dict, the categories of the graph, keys are the names of the categories
+    topics : dict, the topics of the graph, keys are the names of the topics
+
+    matrix_articles : dict, the adjacency matrix of the articles graph
+    matrix_categories : dict, the adjacency matrix of the categories graph
+    matrix_topics : dict, the adjacency matrix of the topics graph
+
+    authorized_levels : list, the authorized levels of the graph
+    levels_map : dict, the map between the levels and the corresponding matrix and vertices
+
+    backlicks : int, the number of backlinks in the graph
     """
     def __init__(self):
-         self.categories = {}
-         self.articles = {}
+        self.articles = {}
+        self.categories = {}
+        self.topics =  {}     
        
-         self.matrix = {}
-         self.matrixt = {}
-         self.nb_articles = 0
-         self.nb_categories = 0
-         self.memory = {}
-         self.backlicks = 0
-         self.edges = 0
+        self.matrix_articles = {}
+        self.matrix_categories = {}
+        self.matrix_topics =  {}
+
+        self.authorized_levels = ["articles", "categories", "topics"]
+        self.levels_map = {"articles": (self.matrix_articles,self.articles),
+                         "categories": (self.matrix_categories, self.categories),
+                          "topics": (self.matrix_topics, self.topics)}
+
+        self.backlicks = 0
 
 
+    """"""
+    def nb_vertices(self , level ):
 
-    def add_article(self,article):
-        self.nb_articles += 1
-        #add article to the graph
-        self.articles[article.title] = article
-        
-        #update the categories
-        self.update_categories(article.category,article)
-
-     
-
-
-    def update_categories(self, category,article):
-        # Checks if the category was already initialized
-        if category not in self.categories: 
-            
-            self.categories[category] = Category(category)
-            self.nb_categories += 1
-       
-        self.categories[category].add_article(article)
-
-   
-     
+        assert level in self.authorized_levels
+        _ , vertices = self.levels_map[level]
+        return len(vertices)
     
-            
-    def add_edge(self,article1,article2):
-        if article1 == '<' :
-            self.backlicks += 0.5
-            article1 = self.previous_article
+    def nb_unique_edges(self, level ):
+        
+        assert level in self.authorized_levels
+        matrix , _ = self.levels_map[level]
+        
+        return sum([len(matrix[title]) for title in matrix.keys()])
 
-        if article2 == '<' :
-            self.backlicks += 0.5
-            self.previous_article = article1
-           
-
-        else:
-            if  article1 not in self.articles or article2 not in self.articles:
-                #print("Article not found : {} or {}".format(article1,article2))
-            
-                return
-            if article1 not in self.memory:
-                self.memory[article1] = {}
-                
-            if article1  in self.memory and article2 in self.memory[article1]:
-                    return
-
-            else:
-                self.memory[article1][article2] = 1
-                category1 = self.articles[article1].category
-                category2 = self.articles[article2].category
-            
-                assert category1 in self.categories
-                assert category2 in self.categories
-
-                
-                if category1== category2:
-                    return
-                if category1 not in self.matrix:
-                    self.matrix[category1]= {}
-                    self.matrix[category1][category2] = 1
-                
-
-                else:
-                    if category2 not in self.matrix[category1]:
-                        self.matrix[category1][category2] = 1
-                    else:
-                        self.matrix[category1][category2] += 1
-                    
-
-                self.edges += 1
-                #update categories attributes
-                self.categories[category1].update_neighbors(category2,out=True)
-                self.categories[category2].update_neighbors(category1,out=False)
-
-
-    def update_graph(self, file_path , edges=False, verbose= False):
+    def update_graph(self, file_path , mode='Initialization', verbose= False):
         with open(file_path) as file:
             tsv_file = csv.reader(file, delimiter="\t")
-            idx = 0
             for line in tsv_file:
                 # Skip empty or commented lines 
                 if len(line)==0 or line[0].startswith("#"):
                     continue
                 else:
-                    if edges :
-                        articles = line[3].split(';')
-                        for i in range(len(articles)-1):
-                            self.add_edge(articles[i],articles[i+1])
-                           
-                    else :           
-                        article = Article(idx,line[0],line[1].split('.')[1])
-                        idx+=+1
+
+                    if mode == 'common_sense_edges' :
+                        path = line[3].split(';')
+                        backlick = 0 
+                        article1 = -1
+
+                        for i in range(len(path)-1):
+                            if path[i+1] == '<':
+                                backlick += 1
+                                continue
+                            elif path[i]== '<': 
+                                article1 = article1-backlick 
+                            else:
+                                article1 =i
+                                backlick = 0
+                            
+                            
+                                self.add_edge(path[article1],path[i+1])
+                                                   
+                    elif mode == 'Initialization' :           
+                        article = Article(line[0],line[1].split('.')[1], line[1].split('.')[-1])
                         self.add_article(article)
+                        #update the categories
+                        category = self.update_categories(article.category,article)
+                        #update the topics
+                        self.update_topics(article.topic,category)
+                    else:
+                        self.add_edge(line[0],line[1])
+    
         if verbose :
-            print("The graph has {} articles, \n{} categories, \nand {} edges.".format(
-                self.nb_articles, self.nb_categories, self.edges))
+            print("The graph has {} articles, {} categories, and {} topics.".format(
+                self.nb_vertices("articles"), self.nb_vertices("categories"),  self.nb_vertices("topics")))
+            print("The number of edges is :\n{} in the articles graph,\n{} in the categories graph,\n{} in the topics graph.".format(
+                self.nb_unique_edges("articles"), self.nb_unique_edges("categories"),  self.nb_unique_edges("topics")))
+
+
+    def add_article(self,article):
+        #add article to the graph
+        self.articles[article.title] = article
+       
+    def update_categories(self, category,article):
+        # Checks if the category was already initialized
+        if category not in self.categories: 
+            self.categories[category] = Category(category, article.topic)
+            self.categories[category].add_article(article)
+        else:
+            self.categories[category].add_article(article)
+        return self.categories[category]
+    
+    def update_topics(self, topic,category):
+        if topic not in self.topics: 
+            self.topics[topic] = Topic(topic)
+            self.topics[topic].add_category(category)
+        else:
+            self.topics[topic].add_category(category)
+
+
+         
+    def add_edge(self,article1,article2):
+       
+        if(article1 == article2):
+            return
+        # update the articles graph     
+        success  = self.update_level(article1,article2,"articles")
+        if success:
+            if self.matrix_articles[article1][article2]> 1:
+                return
+
+            category1 = self.articles[article1].category
+            category2 = self.articles[article2].category
+            
+            # update the categories graph  
+            self.update_level(category1,category2,"categories")
+            
+            topic1 = self.articles[article1].topic
+            topic2 = self.articles[article2].topic
+            
+            # update the topics graph 
+            self.update_level(topic1,topic2,"topics")
+
+    def  update_level (self , vertex1, vertex2, level):
+        # checks that the level is authorized
+        assert level in self.authorized_levels
+
+        # Choose the  matrix and the vertices corresponding to the level
+        matrix , vertices = self.levels_map[level]
+            
+        # Verify if the vertices are already in the graph    
+        if vertex1  not in vertices or vertex2 not in vertices:
+            return 0
+
+      
+
+        # We don't add edges between the same vertex
+        if vertex2 == vertex1:
+            return 0
+
+        ## update the matrix
+        if vertex1 not in matrix:
+            matrix[vertex1] = {}
+            matrix[vertex1][vertex2] = 1
+        else:
+            if vertex2 not in matrix[vertex1]:
+                matrix[vertex1][vertex2] = 1
+            else:
+                matrix[vertex1][vertex2] += 1
+        # update the vertex attributes
+        vertices[vertex1].update_neighbors(vertices[vertex2],out=True)
+        vertices[vertex2].update_neighbors(vertices[vertex1],out=False)
+
+        return 1
 
             
    

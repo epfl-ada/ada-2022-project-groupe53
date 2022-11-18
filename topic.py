@@ -1,32 +1,29 @@
+from Vertex import Vertex
 
-
-class Topic:
+class Topic(Vertex):
     """Topic class
-    Args:
-    name : String
-    categories : dict of Category, key is the id of categories belonging to the topic, value is the category object
-    categories_count : dict, keys are the categories belonging to the topic, 
-                        values are the number of times the category appears 
-                        (Can be usufull to get some statistics about the topic)
-    topic : string, the most general category of the article (first one in categories.tsv)
-    size : int, the number of categories in the topic
+    title : String, the title of the topic
+    categories : Dictionnar of categories, key is the title of the category, value is the category object
     """
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, title):
+        super().__init__(title)
         self.categories = {}
-        self.categories_count = {}
-        self.size = 0
-
-    """"
-    Args:
-    category : Category object to add to the topic
-    Adds the category to the topic and updates the size of the topic
-    """
     
-    def update_category(self, category):
-        if category.title not in self.categories:
-            self.categories[category.title] = category
-            self.categories_count[category.title] = 1
-        else:
-            self.categories_count[category.title] += 1
-        self.size += 1
+    """
+    Returns:
+    The number of different categories in the topic"""
+    def get_nb_different_categories(self):
+        return len(self.categories)
+
+    """
+    Returns:
+    The number of different articles in the topic"""
+    def get_nb_different_articles(self):
+        return sum([category.get_nb_different_articles() for category in self.categories.values()])   
+
+    """
+    Args:
+    category : String, the category to add to the categories belongig to the topic
+    """
+    def add_category(self, category):
+        self.categories[category.title]=category

@@ -1,17 +1,15 @@
+from Vertex import Vertex
 
-
-class Article: 
-    """Article class
-    Args:
-    id : sclar
-    title : string
-    category : string, main category of the article (last one in the categories.tsv)
-    topic : string, the most general category of the article (first one in categories.tsv)
+class Article(Vertex): 
+    """Article class    
+    topc : String, the topic of the article
+    category : String, the category of the article
     """
-    def __init__(self,id,title,category):
-        self.category = category
-        self.id = id
-        self.title = title
+    def __init__(self,title,topic,category):
+        self.topic = topic
+        self.category =  category
+        super().__init__(title)
+
 
 
 
