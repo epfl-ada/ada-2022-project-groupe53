@@ -28,7 +28,7 @@ We define as a category the last item of the categories list.
 We define as a topic the most general category which means appearing first in the list of categories
 The aforementioned represent the nodes of each graph.
 
-In addition, we connect every two nodes $a$ and $b$ with a weighted edge $e$ where $weight(e) = \# distinct ways to go from a to b$
+In addition, we connect every two nodes $a$ and $b$ with a weighted edge $e$ where $weight(e) = number of distinct ways to go from a to b$
 the list of edges is extracted from the finished and unfinished paths files (we take into consideration all the games).
 
 **Step 2. Truth Graph:**
