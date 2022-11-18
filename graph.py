@@ -62,8 +62,22 @@ class Graph:
 
                     if edges :
                         path = line[3].split(';')
+                        backlick = 0 
+                        article1 = 0
+                        article2 = 0
                         for i in range(len(path)-1):
-                            self.add_edge(path[i],path[i+1])
+                            if path[i+1] == '<':
+                                backlick += 1
+                                continue
+                            elif path[i]== '<': 
+                                article1 = article1-backlick 
+                                backlick = 0
+                            else:
+                                article1 +=1
+                                backlick = 0
+                            
+
+                            self.add_edge(path[article1],path[i+1])
                                                    
                     else :           
                         article = Article(line[0],line[1].split('.')[1], line[1].split('.')[-1])
@@ -103,32 +117,25 @@ class Graph:
 
          
     def add_edge(self,article1,article2):
-        if article1 == '<' :
-            self.backlicks += 0.5
-            article1 = self.previous_article
+       
+          
+        # update the articles graph     
+        self.update_level(article1,article2,"articles")
 
-        elif article2 == '<' :
-            self.backlicks += 0.5
-            self.previous_article = article1
-           
-        else:      
-            # update the articles graph     
-            self.update_level(article1,article2,"articles")
+        if self.matrix_articles[article1][article2]> 1:
+            return
 
-            if self.matrix_articles[article1][article2]> 1:
-                return
-
-            category1 = self.articles[article1].category
-            category2 = self.articles[article2].category
-            
-            # update the categories graph  
-            self.update_level(category1,category2,"categories")
-            
-            topic1 = self.articles[article1].topic
-            topic2 = self.articles[article2].topic
-            
-            # update the topics graph 
-            self.update_level(topic1,topic2,"topics")
+        category1 = self.articles[article1].category
+        category2 = self.articles[article2].category
+        
+        # update the categories graph  
+        self.update_level(category1,category2,"categories")
+        
+        topic1 = self.articles[article1].topic
+        topic2 = self.articles[article2].topic
+        
+        # update the topics graph 
+        self.update_level(topic1,topic2,"topics")
 
     def update_level (self , vertex1, vertex2, level):
         # checks that the level is authorized
