@@ -64,7 +64,7 @@ class Graph:
                         path = line[3].split(';')
                         backlick = 0 
                         article1 = -1
-                        article2 = 0
+
                         for i in range(len(path)-1):
                             if path[i+1] == '<':
                                 backlick += 1
