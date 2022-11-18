@@ -16,7 +16,7 @@ In this project, we will try to answer the following questions:
 
 
 ### Data structure and preprocessing: 
- Extracting Data:
+ ***Extracting Data:***
 
 
 
@@ -36,7 +36,9 @@ the list of edges is extracted from the finished and unfinished paths files (we 
 This graph has the same number of vertices as the Common Sense Graph but greater number of edges |E|
 for E being the set of all possible explorable ways between subjects which are not necessarily logical for humans.
 
+Common Sense Graph  VS  Truth Graph
 
+![alt text](https://github.com/epfl-ada/ada-2022-project-groupe53/blob/main/output.png)
 
 **Step3. Initial Analysis:**
 
