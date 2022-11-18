@@ -77,12 +77,17 @@ class Graph:
         if category not in self.categories: 
             self.categories[category] = Category(category, article.topic)
             self.categories[category].add_article(article)
+        else:
+            self.categories[category].add_article(article)
         return self.categories[category]
     
     def update_topics(self, topic,category):
         if topic not in self.topics: 
             self.topics[topic] = Topic(topic)
             self.topics[topic].add_category(category)
+        else:
+            self.topics[topic].add_category(category)
+            
 
          
     def add_edge(self,article1,article2):
