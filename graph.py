@@ -4,6 +4,7 @@ import csv
 from category import Category
 from topic import Topic
 from article import Article
+from urllib.parse import unquote
 
 class Graph:
     """Graph class
@@ -52,14 +53,15 @@ class Graph:
         return sum([len(matrix[title]) for title in matrix.keys()])
 
     def update_graph(self, file_path , mode='Initialization', verbose= False):
-        with open(file_path) as file:
+        with open(file_path,encoding="utf8") as file:
             tsv_file = csv.reader(file, delimiter="\t")
             for line in tsv_file:
                 # Skip empty or commented lines 
                 if len(line)==0 or line[0].startswith("#"):
                     continue
                 else:
-
+                    #deocde strings in line frtom utf8
+                    line = [unquote(l) for l in line]
                     if mode == 'common_sense_edges' :
                         path = line[3].split(';')
                         backlick = 0 
@@ -172,4 +174,12 @@ class Graph:
         return 1
 
             
-   
+    def get_topic_of_article(self,article):
+        if article not in self.articles:
+            return None
+        return self.articles[article].topic
+
+    def get_weight_of_link(self,article1,article2):
+        if article1 not in self.matrix_articles or article2 not in self.matrix_articles[article1]:
+            return 0
+        return self.matrix_articles[article1][article2]
