@@ -61,7 +61,7 @@ class Graph:
                     continue
                 else:
                     #deocde strings in line frtom utf8
-                    line = [unquote(l) for l in line]
+          
                     if mode == 'common_sense_edges' :
                         path = line[3].split(';')
                         backlick = 0 
