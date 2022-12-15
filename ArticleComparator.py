@@ -1,24 +1,14 @@
 import pandas as pd
 import numpy as np
-import torch
 from sentence_transformers import SentenceTransformer
 
-from transformers import BertTokenizer, BertModel
-from nltk.stem import WordNetLemmatizer
-from nltk.corpus import stopwords
-from nltk.tokenize import WordPunctTokenizer
-from ekphrasis.classes.preprocessor import TextPreProcessor
-
-
-from sklearn.decomposition import LatentDirichletAllocation
-from sklearn.feature_extraction.text import TfidfVectorizer
 
 """
-ArticleComparator class uses latent Dirichlet allocation (LDA) to compare articles. 
-The class takes in a list of articles and a number of topics as arguments to its constructor. 
-It has methods to clean the text in the articles, build a dataframe of the articles and their cleaned text,
-and to build an LDA model with the cleaned text. 
-The compare_articles method takes in two articles and returns their similarity according to the LDA model.
+ArticleComparator class uses BERT to compare articles. 
+The class takes in the path to plaintext articles and a list of articls names.
+It has methods to clean the text in the articles, build a dataframe of the articles and their embeddings.
+The compare_articles method takes in two articles content and returns their similarity according to BERT model.
+The compare_titles method takes in two articles titles and returns their similarity according to BERT model.
 """
 
 class ArticleComparator :
@@ -26,8 +16,7 @@ class ArticleComparator :
     def __init__(self,plain_text_path, article_list ):
         """
         @param plain_text_path: String, the path to the folder containing the articles
-        @param article_list: List of Strings, the list of articles to be considered when building the model
-        @param nb_topics: Integer, the number of topics to be considered when building the model
+        @param article_list: List of Strings, the list of articles to be considered when building the modell
         """
         # Initialize the path from which the articles will be read
         self.plain_text_path = plain_text_path
@@ -52,13 +41,14 @@ class ArticleComparator :
                 with open(self.plain_text_path+article+".txt") as f:
                     # Read the text of the article
                     text = f.read()
-                   
-                    # Remove the header
-                    text = text.split("Related subjects:")[1]
-                    text = text.split("\n\n")[1]
+                    # Get the title of the article
+                    text = text.split("\n")
+                    title = text[2]
+                    # Remove the title from the text
+                    text = " ".join(text[3:])
 
                     #Add the article to the dataframe after preprocessing the text, and computing the embedding
-                    articles_df.loc[article] = [text , self.bert_model.encode(text), self.bert_model.encode(article.replace("_", " "))]
+                    articles_df.loc[article] = [text , self.bert_model.encode(text), self.bert_model.encode(title)]
         return articles_df
     
 
@@ -69,7 +59,7 @@ class ArticleComparator :
         @return: Float, the cosine similarity between the two articles
         """
 
-        # Compute the cosine similarity between the two articles
+        # Compute the cosine similarity between the two articles content
         embedding1 = self.articles_df.loc[article1]['article_embedding']
         embedding2 = self.articles_df.loc[article2]['article_embedding']
         return self.cosine_similarity(embedding1, embedding2)
@@ -81,7 +71,7 @@ class ArticleComparator :
         @return: Float, the cosine similarity between the two article titles 
         """
 
-        # Compute the cosine similarity between the two articles
+        # Compute the cosine similarity between the two articles titles
         embedding1 = self.articles_df.loc[article1]['title_embedding']
         embedding2 = self.articles_df.loc[article2]['title_embedding']
         return self.cosine_similarity(embedding1, embedding2)
