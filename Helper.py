@@ -134,6 +134,39 @@ def clean_string(string):
         string = string[:occurence] + string[occurence+3:]
     return string
 
+def create_paths_finished_df(data_path = "data/paths_finished.tsv"):    
+    # Create a df with path, start, end, length
+    df_paths_finished = pd.DataFrame(columns=['path', 'start', 'end', 'length'])
+    counter = 0
+    discarded_paths = 0
+
+    # Read the paths from the paths_finished.tsv file
+    with open(data_path,encoding="utf8") as file:
+                tsv_file = csv.reader(file, delimiter="\t")
+                #For each line in the file
+                for line in tsv_file:
+                    # Skip empty or commented lines 
+                    if len(line)==0 or line[0].startswith("#"):
+                        continue
+                    else:   
+                        path = line[3].split(';')
+                        # Discard paths that contain backclicks or Pikachu
+                        if path.__contains__('<') or path.__contains__('Pikachu'):
+                            discarded_paths += 1
+                            continue
+                        # Set the start node as the fist node in the path
+                        start = path[0]
+                        # Set the end node as the last node in the path
+                        end = path[-1]
+                        # Set the length of the path
+                        length = len(path)
+                        # Add the path to the dataframe
+                        df_paths_finished.loc[counter] = [path, start, end, length]
+                        counter += 1
+    print("Discarded paths due to backclicks: ", discarded_paths)
+    print("Number of paths retained: ", len(df_paths_finished))
+    return df_paths_finished
+
 
 
 
