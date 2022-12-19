@@ -10,17 +10,29 @@ class Category(Vertex):
         super().__init__(title)
         self.topic = topic
         self.articles = {}
+        self.seen_articles = {}
+        
 
     """"
     Returns:
     The number of different articles in the category
     """
     def get_nb_different_articles(self):
-        return len(self.articles)   
+        return len(self.articles)  
+
+
 
     """
     Args:
     article : String, the article to add to the articles belongig to the category
     """
     def add_article(self, article):
-        self.articles[article.title]=article
+        self.articles[article.title]=1
+
+
+    def add_seen_article(self,article):
+        self.seen_articles[article]=1
+
+    def get_nb_seen_articles(self):
+        return len(self.seen_articles)
+       
