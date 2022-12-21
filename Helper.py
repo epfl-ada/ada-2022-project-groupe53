@@ -168,6 +168,100 @@ def create_paths_finished_df(data_path = "data/paths_finished.tsv"):
     return df_paths_finished
 
 
+def dijkstra(adj, source, destination):
+    """
+    @param adj: Dictionary, the adjacency matrix of the graph
+    @param source: String, the name of the source node
+    @param destination: String, the name of the destination node
+
+    @return: List, the shortest path between the source and the destination
+    """
+    try:
 
 
-    
+        #create a dictionary to store the distances of each node from the source
+        distances = {}
+        #create a dictionary to store the previous node of each node
+        previous = {}
+        #create a list of the nodes that have been visited
+        visited = []
+        #create a list of the nodes that have not been visited
+        unvisited = []
+        #create a list of the nodes that have not been visited
+        for node in adj:
+            #initialize the distance of each node to infinity
+            distances[node] = float("inf")
+            #initialize the previous node of each node to None
+            previous[node] = None
+            #add the node to the unvisited list
+            unvisited.append(node)
+        #set the distance of the source to 0
+        distances[source] = 0
+        #while the unvisited list is not empty
+        while unvisited:
+            #sort the unvisited list by the distance of each node from the source
+            unvisited.sort(key=lambda node: distances[node])
+            #get the node with the smallest distance from the source
+            current_node = unvisited.pop(0)
+            #add the node to the visited list
+            visited.append(current_node)
+            #if the current node is the destination
+            if current_node == destination:
+                #create a list to store the shortest path
+                path = []
+                #while the current node is not the source
+                while current_node != source:
+                    #add the current node to the path
+                    path.append(current_node)
+                    #set the current node to the previous node
+                    current_node = previous[current_node]
+                #add the source to the path
+                path.append(source)
+                #reverse the path
+                path.reverse()
+                #return the path
+                return path
+            #for each neighbor of the current node
+            for neighbor in adj[current_node]:
+                #if the neighbor has not been visited
+                if neighbor not in visited:
+                    #calculate the distance of the neighbor from the source
+                    new_distance = distances[current_node] + 1
+                    #if the distance of the neighbor from the source is smaller than the current distance
+                    if neighbor in distances and new_distance < distances[neighbor] :
+                        #update the distance of the neighbor from the source
+                        distances[neighbor] = new_distance
+                        #update the previous node of the neighbor
+                        previous[neighbor] = current_node
+
+    #if the destination is not reachable from the source          
+    except:
+        pass
+    return [] 
+
+    def map_to_percentage (row):
+        return [i/(len(row)-1) for i, x in enumerate(row)]
+
+
+    def get_index_before_after (number, lista):
+        for i in range(len(lista)):
+            if lista[i] > number:
+                return i-1, i
+        return len(lista)-1, len(lista)-1
+
+    def get_intrapolation(number, lista):
+        percentage_list = map_to_percentage(lista)
+        result = []
+        for i in range(number+1):
+            index_before, index_after = get_index_before_after(i/number, percentage_list)
+            if lista[index_after] == lista[index_before]:
+                value = lista[index_after]
+                result.append(round(value,2))
+                
+            else :
+                value = ((lista[index_after] - lista[index_before])/(percentage_list[index_after]-percentage_list[index_before])) * (i/number-percentage_list[index_before])+ lista[index_before]
+                result.append(round(value,2))
+        return result
+
+    def get_intrapolation_mean (number , lista ):
+        return round(np.mean(get_intrapolation(number, lista))*100)
