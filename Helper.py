@@ -1,4 +1,5 @@
 import pandas as pd
+import random
 import csv 
 from bs4 import BeautifulSoup
 import re 
@@ -239,29 +240,52 @@ def dijkstra(adj, source, destination):
         pass
     return [] 
 
-    def map_to_percentage (row):
-        return [i/(len(row)-1) for i, x in enumerate(row)]
+def map_to_percentage (row):
+    return [i/(len(row)-1) for i, x in enumerate(row)]
 
 
-    def get_index_before_after (number, lista):
-        for i in range(len(lista)):
-            if lista[i] > number:
-                return i-1, i
-        return len(lista)-1, len(lista)-1
+def get_index_before_after (number, lista):
+    for i in range(len(lista)):
+        if lista[i] > number:
+            return i-1, i
+    return len(lista)-1, len(lista)-1
 
-    def get_intrapolation(number, lista):
-        percentage_list = map_to_percentage(lista)
-        result = []
-        for i in range(number+1):
-            index_before, index_after = get_index_before_after(i/number, percentage_list)
-            if lista[index_after] == lista[index_before]:
-                value = lista[index_after]
-                result.append(round(value,2))
-                
-            else :
-                value = ((lista[index_after] - lista[index_before])/(percentage_list[index_after]-percentage_list[index_before])) * (i/number-percentage_list[index_before])+ lista[index_before]
-                result.append(round(value,2))
-        return result
+def get_intrapolation(number, lista):
+    percentage_list = map_to_percentage(lista)
+    result = []
+    for i in range(number+1):
+        index_before, index_after = get_index_before_after(i/number, percentage_list)
+        if lista[index_after] == lista[index_before]:
+            value = lista[index_after]
+            result.append(round(value,2))
+            
+        else :
+            value = ((lista[index_after] - lista[index_before])/(percentage_list[index_after]-percentage_list[index_before])) * (i/number-percentage_list[index_before])+ lista[index_before]
+            result.append(round(value,2))
+    return result
 
-    def get_intrapolation_mean (number , lista ):
-        return round(np.mean(get_intrapolation(number, lista))*100)
+def get_intrapolation_mean (number , lista ):
+    return round(np.mean(get_intrapolation(number, lista))*100)
+
+def shufle_dico (dico):
+    keys = list(dico.keys())
+    random.shuffle(keys)
+
+    ShuffledStudentDict = dict()
+    for key in keys:
+        ShuffledStudentDict.update({key: dico[key]})
+    return ShuffledStudentDict
+
+def convert_paths_to_df (source_df,similarity="article_similarity" ):
+    # create a df to store percentage_path and article_similarity
+    test = pd.DataFrame(columns=['percentage_path', similarity])
+    # for each entry in df_paths_finished_filter_game
+    counter = 0
+    for index, row in source_df.iterrows():
+        path = row[similarity]
+        # for each value in article_similarity
+        for i in range(len(path)):
+            # add a new entry in df_paths_finished_filter_game_percentage
+            test.loc[counter] = [i, path[i]]
+            counter += 1
+    return test
