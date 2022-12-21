@@ -3,6 +3,7 @@ import random
 import csv 
 from bs4 import BeautifulSoup
 import re 
+import numpy as np
 
 
 
