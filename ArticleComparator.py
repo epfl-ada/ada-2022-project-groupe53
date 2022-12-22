@@ -76,6 +76,6 @@ class ArticleComparator :
         embedding2 = self.articles_df.loc[article2]['title_embedding']
         return self.cosine_similarity(embedding1, embedding2)
     
-    # define a cosine similarity function that gives values between 0 and 1
+    # define a absolute value of cosine similarity function 
     def cosine_similarity(self, v1, v2):
         return np.abs(np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))).round(2)

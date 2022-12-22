@@ -152,8 +152,6 @@ class Graph:
         if vertex1  not in vertices or vertex2 not in vertices:
             return 0
 
-      
-
         # We don't add edges between the same vertex
         if vertex2 == vertex1:
             return 0

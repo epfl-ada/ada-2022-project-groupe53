@@ -1,11 +1,11 @@
+from bs4 import BeautifulSoup
 import pandas as pd
 import random
 import csv 
-from bs4 import BeautifulSoup
 import re 
 import numpy as np
 
-
+################################################### Functions to generate and update the links dataframe ###################################################
 
 def create_links_df (path='data/links.tsv'):
     """
@@ -121,7 +121,7 @@ def update_link_df_weights (links_df, cs_graph):
     """
     # For each link, get the weight of the link in the graph
     links_df['weight'] = links_df.apply(lambda row: cs_graph.get_weight_of_link(row['From'],row['To']), axis=1)
-    
+
 # create a function that clean a string from each occurence of % and the 2 caracters after it
 def clean_string(string):
     """
@@ -136,7 +136,18 @@ def clean_string(string):
         string = string[:occurence] + string[occurence+3:]
     return string
 
+################################################### Function to generate the finished and optimal paths dataframe ###################################################
+
 def create_paths_finished_df(data_path = "data/paths_finished.tsv"):    
+    """
+    @param data_path: String, the path to the paths_finished.tsv file
+
+    @return: Pandas DataFrame, the dataframe of paths between articles,
+            with the name of the article from which the path is coming
+            and the name of the article to which the path is going
+            and the length of the path
+    """
+    
     # Create a df with path, start, end, length
     df_paths_finished = pd.DataFrame(columns=['path', 'start', 'end', 'length'])
     counter = 0
@@ -168,7 +179,6 @@ def create_paths_finished_df(data_path = "data/paths_finished.tsv"):
     print("Discarded paths due to backclicks: ", discarded_paths)
     print("Number of paths retained: ", len(df_paths_finished))
     return df_paths_finished
-
 
 def dijkstra(adj, source, destination):
     """
@@ -241,28 +251,47 @@ def dijkstra(adj, source, destination):
         pass
     return [] 
 
-def map_to_percentage (row):
-    return [i/(len(row)-1) for i, x in enumerate(row)]
-
-
-def get_index_before_after (number, lista):
-    for i in range(len(lista)):
-        if lista[i] > number:
-            return i-1, i
-    return len(lista)-1, len(lista)-1
+################################################### Function to interpolate function from points  ###################################################
 
 def get_intrapolation(number, lista):
+    """
+    @param number: Integer, the number of samples to get from interpolation
+    @param lista: List, the list of numbers to interpolate from
+
+
+    @return: List, the interpolated list
+    """
+    # Maps the input list to a list of percentages from 0 to 1
+    def map_to_percentage (row):
+        return [i/(len(row)-1) for i, x in enumerate(row)]
+
+    # Finds the indices of the elements in the list before and after the given number
+    def get_index_before_after (number, lista):
+        for i in range(len(lista)):
+            if lista[i] > number:
+                return i-1, i
+        # If the number is greater than the last element in the list, 
+        # return the index of the last element for both the element before and after
+        return len(lista)-1, len(lista)-1
+
+    # Map the input list to a list of percentages
     percentage_list = map_to_percentage(lista)
     result = []
+    # Iterate over a range of numbers from 0 to the input number
     for i in range(number+1):
+        # Find the indices of the elements in the list before and after the current number
         index_before, index_after = get_index_before_after(i/number, percentage_list)
+        # If the elements before and after are the same, 
+        # the intrapolated value is simply the value of that element
         if lista[index_after] == lista[index_before]:
             value = lista[index_after]
             result.append(round(value,2))
-            
+        # If the elements before and after are different, 
+        # perform linear intrapolation using these elements
         else :
             value = ((lista[index_after] - lista[index_before])/(percentage_list[index_after]-percentage_list[index_before])) * (i/number-percentage_list[index_before])+ lista[index_before]
             result.append(round(value,2))
+    # Return the list of intrapolated values
     return result
 
 def get_intrapolation_mean (number , lista ):
@@ -277,6 +306,7 @@ def shufle_dico (dico):
         ShuffledStudentDict.update({key: dico[key]})
     return ShuffledStudentDict
 
+############################################### 
 def convert_paths_to_df (source_df,similarity="article_similarity" ):
     # create a df to store percentage_path and article_similarity
     test = pd.DataFrame(columns=['percentage_path', similarity])
