@@ -36,6 +36,10 @@ class Graph:
                           "topics": (self.matrix_topics, self.topics)}
 
         self.backlicks = 0
+        self.paths = []
+        self.finished = []
+        self.used_articles = 0
+        
 
 
     """"""
@@ -52,7 +56,7 @@ class Graph:
         
         return sum([len(matrix[title]) for title in matrix.keys()])
 
-    def update_graph(self, file_path , mode='Initialization', verbose= False):
+    def update_graph(self, file_path , mode='Initialization', verbose= False,paths_mode=False,finished = True):
         with open(file_path,encoding="utf8") as file:
             tsv_file = csv.reader(file, delimiter="\t")
             for line in tsv_file:
@@ -66,6 +70,7 @@ class Graph:
                         path = line[3].split(';')
                         backlick = 0 
                         article1 = -1
+                        
 
                         for i in range(len(path)-1):
                             if path[i+1] == '<':
@@ -79,6 +84,12 @@ class Graph:
                             
                             
                                 self.add_edge(path[article1],path[i+1])
+                        if paths_mode:
+                            new_path = self.remove_backclick(path)
+                            self.paths.append(new_path)
+                            self.finished.append(finished)
+                           
+                       
                                                    
                     elif mode == 'Initialization' :           
                         article = Article(line[0],line[1].split('.')[1], line[1].split('.')[-1])
@@ -87,6 +98,7 @@ class Graph:
                         category = self.update_categories(article.category,article)
                         #update the topics
                         self.update_topics(article.topic,category)
+
                     else:
                         self.add_edge(line[0],line[1])
     
@@ -96,7 +108,16 @@ class Graph:
             print("The number of edges is :\n{} in the articles graph,\n{} in the categories graph,\n{} in the topics graph.".format(
                 self.nb_unique_edges("articles"), self.nb_unique_edges("categories"),  self.nb_unique_edges("topics")))
 
-
+    def remove_backclick(self,path):
+        n = len(path)
+        remove_idx = []
+        for i in range(n):
+            if path[i] == '<':
+                remove_idx.append(i)
+        for i in range(len(remove_idx)):
+            del path[remove_idx[i]-2*i]
+            del path[remove_idx[i]-2*i-1]
+        return path
     def add_article(self,article):
         #add article to the graph
         self.articles[article.title] = article
@@ -117,6 +138,15 @@ class Graph:
         else:
             self.topics[topic].add_category(category)
 
+    def update_seen_articles(self,vertex1,vertex2,article1,article2,level):
+        if level == "articles":
+            return
+        elif level == "categories":
+            self.categories[vertex1].add_seen_article(article1)
+            self.categories[vertex2].add_seen_article(article2)
+        elif level == "topics":
+            self.topics[vertex1].add_seen_article(article1)
+            self.topics[vertex2].add_seen_article(article2)
 
          
     def add_edge(self,article1,article2):
@@ -131,14 +161,19 @@ class Graph:
 
             category1 = self.articles[article1].category
             category2 = self.articles[article2].category
-            
+
+
+           
+           
             # update the categories graph  
+            self.update_seen_articles(category1,category2,article1,article2,"categories")
             self.update_level(category1,category2,"categories")
             
             topic1 = self.articles[article1].topic
             topic2 = self.articles[article2].topic
             
             # update the topics graph 
+            self.update_seen_articles(topic1,topic2,article1,article2,"topics")
             self.update_level(topic1,topic2,"topics")
 
     def  update_level (self , vertex1, vertex2, level):
@@ -152,7 +187,7 @@ class Graph:
         if vertex1  not in vertices or vertex2 not in vertices:
             return 0
 
-      
+
 
         # We don't add edges between the same vertex
         if vertex2 == vertex1:
