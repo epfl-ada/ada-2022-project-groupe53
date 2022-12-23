@@ -55,7 +55,7 @@ for E being the set of all possible lniks between articles which are not necessa
 
 Common Sense Graph  VS  Truth Graph
 
-![alt text](https://github.com/epfl-ada/ada-2022-project-groupe53/blob/main/output.png)
+![alt text](https://github.com/epfl-ada/ada-2022-project-groupe53/blob/main/plots/output.png)
 
 **Step2. Initial Analysis:**
 
