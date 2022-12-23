@@ -51,7 +51,7 @@ This graph is not weighted and is directed.
  We connect every two articles $a$ and $b$ with a weighted edge $e$ where $weight(e) = number of times to go from a to b$
 the list of edges is extracted from the finished and unfinished paths files (we take into consideration all the games).
 
-## Discussion :
+
 The truth graph has the same number of vertices as the Common Sense Graph but greater number of edges |E|
 for E being the set of all possible lniks between articles which are not necessarily logical for humans, as explained in the datastory.
 
@@ -59,7 +59,7 @@ Common Sense Graph  VS  Truth Graph
 
 ![alt text](https://github.com/epfl-ada/ada-2022-project-groupe53/blob/main/output.png)
 
-**Step3. Initial Analysis:**
+**Step2. Initial Analysis:**
 
 From each graph, we contruct a dataframe with the following columns:
 
@@ -88,13 +88,23 @@ The unreached articles contain 2% of the total number of links in the truth grap
 However, we have found that the players only clicked on 48% of the links in the dataset.<br> Adding that to the above finding, we can conclude that the players only explored half of the links thay seen.<br>
 
 
-## In our datastory, we try to understand why is the case. <!-- insert emoji --> :thinking: 
+## In our datastory, we try to understand why is it the case. <!-- insert emoji --> :thinking: 
+Our analysis will be divided into 5 parts :
+- Part 1: Introduction to the dataset
+- Part 2: Semantics Analysis
+  - Comparison of semantic similarities between human and optimal paths
+  - Node centrality analysis
+- Part 3: Influence of graph architecture on people's behaviour
+  - Position of links in article
+  - Number of links in article
+- Part 4: Case study : Missed mate in one
+- Part 5: Conclusion
 <br>
 
 
 ## Requirements (external Libraries): :wrench:
-- Python 3.8
-- 
+- BeautifulSoup
+- sentence_transformers
 ## Dropped Ideas: :x:
 At the end of milestone 2, our datastory was originally about exploring the relationship between the topics and categories and how do people link between them and use that skill to play the game.<br>
 However, we have decided to move on past that, as we found that the data was not sufficient to answer the questions we had in mind, and we believe we have a clearer and more feasable datastory now.
@@ -106,12 +116,15 @@ Week 9: Initial Analysis and ReadMe <br>
 Week 10-11: Hw2 <br>
 **Milestone 3:** <br>
 Week 12: Complete Analysis <br>
-Week 13: Data Story Wesbite creation <br>
- 
+Week 13: Grouping Analysis <br>
+Week 14: Website creation <br>
 
 ## Organization within the team: :busts_in_silhouette:
 
-Hichem Hadhri: Architecture, ReadMe <br>
-Youssef Mamlouk: ReadMe and plot improvements <br>
-Mehdi Mezghani: Architecture improvements, initial analysis <br>
-Mehdi Sellami: Graph plots, initial analysis <br>
+Hichem Hadhri: Architecture, ReadMe , initial analysis , analysis <br>
+Youssef Mamlouk: plot improvements , initial analysis , analysis, interactive plots <br>
+Mehdi Mezghani: Architecture improvements, initial analysis , analysis, website design , notebook refactoring <br>
+Mehdi Sellami: Graph plots, website creation, script writing, analysis <br>
+
+
+### With Love, groupe53.
