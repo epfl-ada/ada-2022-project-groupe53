@@ -1,5 +1,11 @@
-# Title: Bacteria at the world cup ! :scream:
+# Title: Disover your web instincts ! :mag:
 (to be confirmed depending on least related topics obtained by the data)
+
+
+## Data story
+to understand your web instincts, Check this out : add_site_here
+
+
 ## Abstract: :page_with_curl:
 The Way We Think Everything Is Connected Isn’t the Way Everything Is Connected.
 By exploring the Wikispeedia dataset, a human-computation game in which users are asked to navigate from a given source to a given target article, by only clicking Wikipedia links, we aim to derive people common sense when it comes to subject relations. 
@@ -20,21 +26,34 @@ In this project, we will try to answer the following questions:
 
 
 
-**Step 1. Common Sense Graph construction:**
-We aim to construct three directed Common Sense Graphs: Articles common sense graph, Categories common sense graph and  Topics common sense graph;
+**Step 1. Common Sens and truth Graph construction:**
+We aim to construct two directed Graphs from the dataset : 
+- The Common Sense Graph
+- The Truth Graph
+  
+The graphs will be constructed on three different levels  : 
+- Articles
+- Categories
+- Topics
 
-For that purpose,  we extract from the categories.tsv file the list of articles and we assign to each one of them a category and a topic.
-We define as a category the last item of the categories list.
-We define as a topic the most general category which means appearing first in the list of categories
-The aforementioned represent the nodes of each graph.
+The latter two are extracted from the categories.tsv file and are constructed for visualization purposes.
 
-In addition, we connect every two nodes $a$ and $b$ with a weighted edge $e$ where $weight(e) = number of distinct ways to go from a to b$
+
+  
+`The common sense graph`: It represents the links clicked on by the players as edges and the discovered articles (topics, categories) as vertices.
+The graph is directed and weighted. The weight of an edge is the number of times it has been clicked on by the players. <br>
+`The truth graph`: It represents the links that are logically possible as edges and the discovered articles (topics, categories) as vertices.
+This graph is not weighted and is directed.
+
+
+
+
+ We connect every two articles $a$ and $b$ with a weighted edge $e$ where $weight(e) = number of times to go from a to b$
 the list of edges is extracted from the finished and unfinished paths files (we take into consideration all the games).
 
-**Step 2. Truth Graph:**
-
-This graph has the same number of vertices as the Common Sense Graph but greater number of edges |E|
-for E being the set of all possible explorable ways between subjects which are not necessarily logical for humans.
+## Discussion :
+The truth graph has the same number of vertices as the Common Sense Graph but greater number of edges |E|
+for E being the set of all possible lniks between articles which are not necessarily logical for humans, as explained in the datastory.
 
 Common Sense Graph  VS  Truth Graph
 
@@ -61,24 +80,24 @@ From each graph, we contruct a dataframe with the following columns:
 | nb_categories       | The number of categories contained in the Vertex (Not valid for Articles and Categories df)   |
 
 
-We have additionally done some basic statistics to come up with numbers such as number of articles, edges, distribuition of articles among topics. 
-This has shown that articles are not uniformly distributed across topics. 
-From basic inspections, we have found that Geography is a potential hub that can be further studied in future analysis.
-Indeed, the plot clearly indicates strong incoming links from all the topics to Geography.
+We have additionally done some basic statistics to come up with numbers such as number of articles, edges.<br>
+
+We have found that the players did not explore all the articles in the dataset (? missed articles). <br>
+The unreached articles contain 2% of the total number of links in the truth graph. 
+
+However, we have found that the players only clicked on 48% of the links in the dataset.<br> Adding that to the above finding, we can conclude that the players only explored half of the links thay seen.<br>
 
 
-Once we have done some basic exploratory analysis, we decide to compare the number of explored paths with the total number of possible paths 
-by computing the fraction of nodes degrees and edges weights between the  two constructed dataframes.
-
-In the future, we aim to compare the obtained fractions across categories and topics;
-How does the percentage of a given topic exploration reflect the hottness of that topic ?
-It is also interesting to analyse the effect of backclicks.
-How can backclicks give us insights on subject properties (too general, too specific) ?
+## In our datastory, we try to understand why is the case. <!-- insert emoji --> :thinking: 
+<br>
 
 
+## Requirements (external Libraries): :wrench:
+- Python 3.8
+- 
 ## Dropped Ideas: :x:
-At some point of our discussions, we considered studying the played paths difficulty. However, we have decided that it was not relevant to answer 
-the stated research questions. Furthermore, it is hard to avoid having a degree of bias when talking about difficulty given the presented dataset.
+At the end of milestone 2, our datastory was originally about exploring the relationship between the topics and categories and how do people link between them and use that skill to play the game.<br>
+However, we have decided to move on past that, as we found that the data was not sufficient to answer the questions we had in mind, and we believe we have a clearer and more feasable datastory now.
 
 ## Proposed timeline:   :calendar:                                                                                                                                                                          
 **Milestone 2:** <br>
