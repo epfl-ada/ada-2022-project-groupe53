@@ -3,6 +3,8 @@ import pandas as pd
 import random
 import csv 
 import re 
+from category import Category
+from graph import Graph
 import numpy as np
 
 ################################################### Functions to generate and update the links dataframe ###################################################
@@ -319,6 +321,20 @@ def convert_paths_to_df (source_df,similarity="article_similarity" ):
             counter += 1
     return test
 
+def convert_paths_to_df_with_hue(source_df,similarity="article_similarity", hue = "game"): 
+    # create a df to store percentage_path and article_similarity
+    test = pd.DataFrame(columns=['percentage_path', similarity,'game'])
+    # for each entry in df_paths_finished_filter_game
+    counter = 0
+    for index, row in source_df.iterrows():
+        path = row[similarity]
+        game = row[hue]
+        # for each value in article_similarity
+        for i in range(len(path)):
+            # add a new entry in df_paths_finished_filter_game_percentage
+            test.loc[counter] = [i, path[i],game]
+            counter += 1
+    return test
 
 ################################################### Function is used to create a dataframe with the vertices of a given level  ###################################################
 
