@@ -39,47 +39,55 @@ class Graph:
 
 
     """"""
-    def nb_vertices(self , level ):
-
+    def nb_vertices(self , level):
+        #check if the level is authorized
         assert level in self.authorized_levels
+        #define the vertices
         _ , vertices = self.levels_map[level]
+        #return the number of vertices
         return len(vertices)
     
     def nb_unique_edges(self, level ):
-        
+        #check if the level is authorized
         assert level in self.authorized_levels
+        #define the matrix
         matrix , _ = self.levels_map[level]
-        
+        #return the number of edges
         return sum([len(matrix[title]) for title in matrix.keys()])
 
     def update_graph(self, file_path , mode='Initialization', verbose= False):
+        # Read the file
         with open(file_path,encoding="utf8") as file:
             tsv_file = csv.reader(file, delimiter="\t")
+            # Iterate over the lines
             for line in tsv_file:
                 # Skip empty or commented lines 
                 if len(line)==0 or line[0].startswith("#"):
                     continue
                 else:
-                    #deocde strings in line frtom utf8
-          
+                    #decode strings in line frtom utf8
                     if mode == 'common_sense_edges' :
+    
                         path = line[3].split(';')
                         backlick = 0 
                         article1 = -1
 
+                        #iterate over the path
                         for i in range(len(path)-1):
+                            #check if the path contains a backlick
                             if path[i+1] == '<':
+                                #update the number of backlicks
                                 backlick += 1
                                 continue
-                            elif path[i]== '<': 
+                            elif path[i]== '<':
                                 article1 = article1-backlick 
                             else:
                                 article1 =i
                                 backlick = 0
-                            
-                            
+                                #add the edge
                                 self.add_edge(path[article1],path[i+1])
                                                    
+                    #add the article to the graph
                     elif mode == 'Initialization' :           
                         article = Article(line[0],line[1].split('.')[1], line[1].split('.')[-1])
                         self.add_article(article)
@@ -88,8 +96,10 @@ class Graph:
                         #update the topics
                         self.update_topics(article.topic,category)
                     else:
+                        #add the edge
                         self.add_edge(line[0],line[1])
-    
+
+        #print the graph information
         if verbose :
             print("The graph has {} articles, {} categories, and {} topics.".format(
                 self.nb_vertices("articles"), self.nb_vertices("categories"),  self.nb_vertices("topics")))
@@ -104,15 +114,20 @@ class Graph:
     def update_categories(self, category,article):
         # Checks if the category was already initialized
         if category not in self.categories: 
+            # Initialize the category
             self.categories[category] = Category(category, article.topic)
+            # Add the article to the category
             self.categories[category].add_article(article)
         else:
             self.categories[category].add_article(article)
         return self.categories[category]
     
     def update_topics(self, topic,category):
+        # Checks if the topic was already initialized
         if topic not in self.topics: 
+            # Initialize the topic
             self.topics[topic] = Topic(topic)
+            # Add the category to the topic
             self.topics[topic].add_category(category)
         else:
             self.topics[topic].add_category(category)

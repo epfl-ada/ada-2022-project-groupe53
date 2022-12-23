@@ -189,8 +189,6 @@ def dijkstra(adj, source, destination):
     @return: List, the shortest path between the source and the destination
     """
     try:
-
-
         #create a dictionary to store the distances of each node from the source
         distances = {}
         #create a dictionary to store the previous node of each node
@@ -320,3 +318,115 @@ def convert_paths_to_df (source_df,similarity="article_similarity" ):
             test.loc[counter] = [i, path[i]]
             counter += 1
     return test
+
+
+################################################### Function is used to create a dataframe with the vertices of a given level  ###################################################
+
+
+#Level can be "articles", "categories" or "topics"
+def vertices_to_df(graph, level):
+    #Check that the level is valid
+    assert level in graph.authorized_levels
+    #Get the vertices of the given level
+    _, verteces = graph.levels_map[level]
+    #Create the header of the dataframe
+    header =["Topic", "Category", "degree", "out_degree", "in_degree", "total_weight" ,"total_weight_out", "total_weight_in","average_weight_per_edge", "average_weight_out", "average_weight_in"]  
+    #Remove the columns that are not relevant for the given level
+    if level == "categories":
+        header.remove("Category")
+        header.append("nb_articles")
+        header.append("nb_seen_articles")
+    if level == "topics":
+        header.remove("Topic")
+        header.remove("Category")
+        header.append("nb_categories")
+        header.append("nb_articles")
+        header.append("nb_seen_articles")
+    
+    df = pd.DataFrame(columns=header)
+    
+    #Fill the dataframe with the vertices
+    for vertex in verteces.values():
+        nb_unique_outgoing_edges = vertex.get_nb_different_out_neighbours()
+        nb_unique_incoming_edges = vertex.get_nb_different_in_neighbours()
+        nb_unique_edges = nb_unique_outgoing_edges + nb_unique_incoming_edges
+
+        #We only keep the vertices that have at least one edge
+        if (nb_unique_edges != 0) :
+            total_weight_out = vertex.get_total_out_weight()
+            total_weight_in = vertex.get_total_in_weight()
+            total_weight = total_weight_out + total_weight_in
+            average_weight_out = round(total_weight_out/nb_unique_outgoing_edges, 2) if nb_unique_outgoing_edges != 0 else 0
+            average_weight_in = round(total_weight_in/nb_unique_incoming_edges,2) if nb_unique_incoming_edges != 0 else 0
+            average_weight_per_edge = round(total_weight/nb_unique_edges, 2)
+
+            if level == "articles":
+                df.loc[vertex.title] = [vertex.topic, vertex.category, nb_unique_edges, nb_unique_outgoing_edges, nb_unique_incoming_edges, total_weight, total_weight_out, total_weight_in, average_weight_per_edge, average_weight_out, average_weight_in]
+                df["Topic"].astype("category")
+                df["Category"].astype("category")
+            elif level == "categories":
+                df.loc[vertex.title]= [vertex.topic, nb_unique_edges, nb_unique_outgoing_edges, nb_unique_incoming_edges, total_weight, total_weight_out, total_weight_in, average_weight_per_edge, average_weight_out, average_weight_in, vertex.get_nb_different_articles(),vertex.get_nb_seen_articles()]
+                df["Topic"].astype("category")
+            else:
+                df.loc[vertex.title]= [nb_unique_edges, nb_unique_outgoing_edges, nb_unique_incoming_edges, total_weight, total_weight_out, total_weight_in, average_weight_per_edge, average_weight_out, average_weight_in, vertex.get_nb_different_categories(), vertex.get_nb_different_articles(),vertex.get_nb_seen_articles()]
+    return df
+
+################################################### Function that draws the graph given a dataframe ###################################################
+
+def draw_graph (graph, df_topics):
+    n = len(df_topics)
+    #set colors of a palette
+    color = sns.color_palette('dark', n)
+
+    labels = list(graph.topics.keys())
+    #Map each category to a color
+    color_map = {category: color[i] for i, category in enumerate(graph.topics.keys())}
+
+    G1 = nx.DiGraph()
+    #Add the edges to the graph
+    for key, value in graph.matrix_topics.items():
+        for key2, value2 in value.items():
+                G1.add_edge(key,key2,weight=value2, color=color_map[key])
+
+    #Add the nodes to the graph
+    color = []
+    for node in G1.nodes(): 
+        color.append(color_map[node])
+
+    #Add the labels to the graph
+    #set node text to white
+    label_dict = {}
+    for i in range(len(labels)):
+        label_dict[labels[i]] = labels[i]
+
+
+    edges = G1.edges()
+    weights = [G1[u][v]['weight']/250 for u,v in edges]
+    colors = [G1[u][v]['color'] for u,v in edges]
+
+    #Nodes positions settings
+    nodePos = nx.circular_layout(G1)
+    nodePos['People'] = [ -0.5, 0]
+    nodePos['Citizenship'] = [0.5,0]
+    nodePos['Geography'] = [0,0.1]
+    nodePos['Science'] = [-0.5,0.5]
+    nodePos['Everyday_life'] = [-0.75,0.25]
+    nodePos['History'] = [0,0.5]
+    nodePos['Countries'] = [0.3,0.3]
+    nodePos['Design_and_Technology'] = [0,-0.3]
+    nodePos['Language_and_literature'] = [-0.3,-0.3]
+    nodePos['Religion'] = [0.1,-0.1]
+    nodePos['Mathematics'] = [0,-0.4]
+    nodePos['Art'] = [-0.5,-0.4]
+    nodePos['IT'] = [-0.90,0]
+    nodePos['Music'] = [0.5,-0.4]
+    nodePos['Business_Studies'] = [0.3,-0.3]
+
+    #Set nodes sizes
+    size = [df_topics.loc[t_name].nb_seen_articles*25 for t_name in nx.nodes(G1)]
+      
+    nx.draw_networkx(G1,node_size = size,pos = nodePos,node_color = color,labels=label_dict, 
+                    width= weights, edge_color=colors, arrows=True, arrowstyle='->',arrowsize=20, 
+                    font_size=15, font_color='white', font_weight='bold', font_family='sans-serif', 
+                    alpha=1.0, bbox=None, ax=None, with_labels=True, edgecolors='black', node_shape='o', 
+                    connectionstyle='arc3, rad=0.1', min_source_margin=0.05)
