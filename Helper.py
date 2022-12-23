@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import seaborn as sns
 import pandas as pd
 import random
 import csv 
@@ -6,6 +7,8 @@ import re
 from category import Category
 from graph import Graph
 import numpy as np
+import matplotlib.pyplot as plt
+import networkx as nx
 
 ################################################### Functions to generate and update the links dataframe ###################################################
 
@@ -253,7 +256,7 @@ def dijkstra(adj, source, destination):
 
 ################################################### Function to interpolate function from points  ###################################################
 
-def get_intrapolation(number, lista):
+def get_interpolation(number, lista):
     """
     @param number: Integer, the number of samples to get from interpolation
     @param lista: List, the list of numbers to interpolate from
@@ -287,15 +290,15 @@ def get_intrapolation(number, lista):
             value = lista[index_after]
             result.append(round(value,2))
         # If the elements before and after are different, 
-        # perform linear intrapolation using these elements
+        # perform linear interpolation using these elements
         else :
             value = ((lista[index_after] - lista[index_before])/(percentage_list[index_after]-percentage_list[index_before])) * (i/number-percentage_list[index_before])+ lista[index_before]
             result.append(round(value,2))
     # Return the list of intrapolated values
     return result
 
-def get_intrapolation_mean (number , lista ):
-    return round(np.mean(get_intrapolation(number, lista))*100)
+def get_interpolation_mean (number , lista ):
+    return round(np.mean(get_interpolation(number, lista))*100)
 
 def shufle_dico (dico):
     keys = list(dico.keys())

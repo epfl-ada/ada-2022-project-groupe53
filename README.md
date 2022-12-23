@@ -1,21 +1,19 @@
 # Title: Disover your web instincts ! :mag:
-(to be confirmed depending on least related topics obtained by the data)
 
 
 ## Data story
-to understand your web instincts, Check this out : add_site_here
+to understand your web instincts, Check this out : href="https://mehdimezghani1.wixsite.com/my-site-2"
 
 
 ## Abstract: :page_with_curl:
-The Way We Think Everything Is Connected Isn’t the Way Everything Is Connected.
-By exploring the Wikispeedia dataset, a human-computation game in which users are asked to navigate from a given source to a given target article, by only clicking Wikipedia links, we aim to derive people common sense when it comes to subject relations. 
-
+Wikispeedia is an online game created by Robert West for the purposes of data science research, using a subset of articles from Wikipedia.
+For every game, you are given two articles, starting from the source to the target by only following the links that appear in the articles you encounter.
+Through our analysis, we have managed to find 4 key factors that can explain the choices made by the players.
 ## Research questions: :question:
-In this project, we will try to answer the following questions:
-- What are the subjects people are most comfortable with ?
-- How common sense knowledge influence the way people link subjects together?
-- What makes a subject a hub or an authority ?
-- How can we use this knowledge to improve the way we navigate through the web ?
+In this project, we aim to understand the human intuition and the influence of a graph architecture on the choices the people make when navigating through a graph.
+Namely we will attempt to answer these questions:
+1) How much do the players rely on the semantic relationship? We believe the players try to pick links that are sementically as close as possible to the target article.
+2) How does the architecture of the graph impact the choices of the players? We want to investigate if the players have an inherent bias to pick links based on the graph's architecture.
 
 
 ## Methods: :hammer:
@@ -42,7 +40,7 @@ The latter two are extracted from the categories.tsv file and are constructed fo
   
 `The common sense graph`: It represents the links clicked on by the players as edges and the discovered articles (topics, categories) as vertices.
 The graph is directed and weighted. The weight of an edge is the number of times it has been clicked on by the players. <br>
-`The truth graph`: It represents the links that are logically possible as edges and the discovered articles (topics, categories) as vertices.
+`The truth graph`: It represents the links that are possible as edges and the discovered articles (topics, categories) as vertices.
 This graph is not weighted and is directed.
 
 
@@ -82,8 +80,8 @@ From each graph, we contruct a dataframe with the following columns:
 
 We have additionally done some basic statistics to come up with numbers such as number of articles, edges.<br>
 
-We have found that the players did not explore all the articles in the dataset (? missed articles). <br>
-The unreached articles contain 2% of the total number of links in the truth graph. 
+We found that the players did not explore all the articles in the dataset (? missed articles). <br>
+The unreached articles contain 5% of the total number of links in the truth graph. 
 
 However, we have found that the players only clicked on 48% of the links in the dataset.<br> Adding that to the above finding, we can conclude that the players only explored half of the links thay seen.<br>
 
@@ -116,7 +114,7 @@ Week 9: Initial Analysis and ReadMe <br>
 Week 10-11: Hw2 <br>
 **Milestone 3:** <br>
 Week 12: Complete Analysis <br>
-Week 13: Grouping Analysis <br>
+Week 13: Complete Analysis <br>
 Week 14: Website creation <br>
 
 ## Organization within the team: :busts_in_silhouette:

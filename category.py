@@ -10,6 +10,7 @@ class Category(Vertex):
         super().__init__(title)
         self.topic = topic
         self.articles = {}
+        self.seen_articles = {}
 
     """"
     Returns:
@@ -24,3 +25,10 @@ class Category(Vertex):
     """
     def add_article(self, article):
         self.articles[article.title]=article
+
+
+    def add_seen_article(self,article):
+        self.seen_articles[article]=article
+
+    def get_nb_seen_articles(self):
+        return len(self.seen_articles)

@@ -12,6 +12,7 @@ class Vertex(ABC):
         self.title = title
         self.neighbors_out = {}
         self.neighbors_in = {}
+        self.seen_articles = 0
 
     """"
     Returns:
@@ -64,4 +65,5 @@ class Vertex(ABC):
                 self.neighbors_in[vertex] += 1
 
 
-
+    def get_nb_seen_articles(self):
+        return self.seen_articles 

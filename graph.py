@@ -132,6 +132,15 @@ class Graph:
         else:
             self.topics[topic].add_category(category)
 
+    def update_seen_articles(self,vertex1,vertex2,article1,article2,level):
+        if level == "articles":
+            return
+        elif level == "categories":
+            self.categories[vertex1].add_seen_article(article1)
+            self.categories[vertex2].add_seen_article(article2)
+        elif level == "topics":
+            self.topics[vertex1].add_seen_article(article1)
+            self.topics[vertex2].add_seen_article(article2)
 
          
     def add_edge(self,article1,article2):
@@ -149,10 +158,15 @@ class Graph:
             
             # update the categories graph  
             self.update_level(category1,category2,"categories")
+             # update the categories graph  
+            self.update_seen_articles(category1,category2,article1,article2,"categories")
+            self.update_level(category1,category2,"categories")
             
             topic1 = self.articles[article1].topic
             topic2 = self.articles[article2].topic
             
+            # update the topics graph 
+            self.update_seen_articles(topic1,topic2,article1,article2,"topics")
             # update the topics graph 
             self.update_level(topic1,topic2,"topics")
 
