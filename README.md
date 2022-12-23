@@ -121,10 +121,10 @@ Week 14: Website creation <br>
 
 ## Organization within the team: :busts_in_silhouette:
 
-Hichem Hadhri: Architecture, ReadMe , initial analysis , parts of analysis (2,3) <br>
-Youssef Mamlouk: plot improvements , initial analysis , analysis (4), interactive plots <br>
-Mehdi Mezghani: Architecture improvements, initial analysis , analysis (3), website design , notebook refactoring <br>
-Mehdi Sellami: Graph plots, website creation, script writing, proof check <br>
+Hichem Hadhri: Architecture, ReadMe , initial analysis , analysis <br>
+Youssef Mamlouk: plot improvements , initial analysis , analysis, interactive plots <br>
+Mehdi Mezghani: Architecture improvements, initial analysis , analysis, website design , notebook refactoring <br>
+Mehdi Sellami: Graph plots, website creation, script writing, analysis <br>
 
 
 ### With Love, groupe53.
